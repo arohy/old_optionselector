@@ -39,7 +39,7 @@
       //*  фиксим опции, которые идут выше
       var
         $level = tree.get_level( option_index ),
-        $leaf =  {};
+        $leaf  = {};
 
       $level.forEach( function( $variant ){
         if( $variant.position == value ){
@@ -50,9 +50,19 @@
       $.each( $options, function( index, $option ){
         if( index > option_index ){
           var
-            $first = tree.get_first( $leaf );
+            $first       = tree.get_first( $leaf ),
+            level        = tree.get_level( index ),
+            not_available = true;
 
-          $options[ index ].selected = $first.position;
+          level.forEach( function( $variant ){
+            if( $variant.position == $options[ index ].selected && $variant.available ){
+              not_available = false;
+            }
+          });
+
+          if( not_available ){
+            $options[ index ].selected = $first.position;
+          };
 
           $leaf = $first.tree;
         };
