@@ -1,39 +1,40 @@
-  /* функции для работы с деревом модификаций */
+  //  функции для работы с деревом модификаций
   this.tree = function(){
-    /*   инициализайия дерева модификаций   */
+    //  инициализайия дерева модификаций
     this.init = function(){
-      var $tree = {};
+      var
+        $tree = {};
 
-      /* перебираем все варианты модификаций */
+      //  перебираем все варианты модификаций
       $.each( $product.variants, function( variants_index, $variant ) {
         var
           variant_id = $variant.id,
-          $leaf =      $tree;
+          $leaf      = $tree;
 
         /*
         console.log('tree: init: variants_index: ', variants_index);
         console.log('tree: init: $variant: ', $variant);
         /**/
 
-        /*
-          перебираем варианты свойств модификаций и вносим их в дерево модификаций
-          так же дополняем каждый узел нужными нам свойствами
-          если потребуется добавить информацию - делаем это тут, в нужных местах тянем нужную инфу
-        */
+        //  перебираем варианты свойств модификаций и вносим их в дерево модификаций
+        //  так же дополняем каждый узел нужными нам свойствами
+        //  если потребуется добавить информацию - делаем это тут, в нужных местах тянем нужную инфу
         $.each( $variant.option_values, function(index, $value) {
           /*
           console.log('tree: init: index: ', index);
           console.log('tree: init: $value:', $value);
           /**/
 
-          var id = '';
-          /* если дошли до последнего уровня, то записываем вариант модификации и ее доступность */
+          var
+            id = '';
+          //  если дошли до последнего уровня, то записываем вариант модификации и ее доступность
           if( index == ($variant.option_values.length - 1) ){
             id = variant_id;
-            var is_available = $variant.available;
+            var
+              is_available = $variant.available;
           };
-          
-          /* если такого свойства модификации еще нет, то загоняем все параметры в ноду */
+
+          //  если такого свойства модификации еще нет, то загоняем все параметры в ноду
           if( !$leaf[ $value.position ] ){
             $leaf[ parseInt( $value.position ) ] = {
               id:           parseInt( $value.id ),
@@ -50,10 +51,9 @@
 
           $leaf = $leaf[ $value.position ].tree;
         });
-        
       });
-      
-      /* проставляем доступность опций модификаций по дереву */
+
+      //  проставляем доступность опций модификаций по дереву
       $.each( $tree, function( index, $leaf ) {
         leaf_available( $leaf );
       });
@@ -61,7 +61,7 @@
       return $tree;
     };
 
-    /* фиксим доступность свойств модификаций прямо в дереве */
+    //  фиксим доступность свойств модификаций прямо в дереве
     function leaf_available( $leaf ){
       if( $leaf.variant_id == '' ){
         var is_available = false;
@@ -78,51 +78,48 @@
       return $leaf.available;
     };
 
-    /*
-      получаем вариант модификации, основываясь на выбранных опциях
-      возвращает id варианта модификации
-    */
+    //  получаем вариант модификации, основываясь на выбранных опциях
+    //  возвращает id варианта модификации
     this.get_variant = function(){
-      var 
-        $leaf =       $tree,
-        variant_id =  0;
-      
+      var
+        $leaf      = $tree,
+        variant_id = 0;
+
       /*
       console.log('tree: get_variant: $leaf: start: ', $leaf);
       console.log('');
       /**/
-      
+
       $.each( $options, function( index, $option ){
-        var option_id = $option.selected;
-        
+        var
+          option_id = $option.selected;
+
         /*
         console.log('tree: get_variant: each: $option: ',$option);
         console.log('tree: get_variant: each: $leaf: ',$leaf);
         /**/
-        
+
         if( $leaf[ option_id ].variant_id == '' ){
           $leaf = $leaf[ option_id ].tree;
         }else{
           variant_id = $leaf[ option_id ].variant_id;
         };
-        
       });
-      
+
       return variant_id;
     };
 
-    /*
-      возвращает массив значений с уровня
-      level - уровень дерева
-    */
+    //  возвращает массив значений с уровня
+    //  level - уровень дерева
     this.get_level = function( level ){
       var
-        $leaf =  $tree,
+        $leaf  = $tree,
         $level = [],
-        sort =   [];
+        sort   = [];
 
       $.each( $options, function( option_level, $option ){
-        var option_id = $option.selected;
+        var
+          option_id = $option.selected;
 
         if( option_level == level ){
           $.each( $leaf, function( leaf_index, $variant ){
@@ -131,9 +128,8 @@
 
           return false;
         };
-        
+
         $leaf = $leaf[ option_id ].tree;
-        
       });
 
       sort.sort( function( a, b ){ 
@@ -153,20 +149,18 @@
       return $level;
     };
 
-    /*
-      выбор первого ДОСТУПНОГО элемента на уровне дерева
-      возвращает объект
-    */
+    //  выбор первого ДОСТУПНОГО элемента на уровне дерева
+    //  возвращает объект
     this.get_first = function( $level ){
-      var 
+      var
         $first = {},
-        temp =   [],
-        flag =   false;
+        temp   = [],
+        flag   = false;
       
       $.each( $level, function( position, $variant ){
         temp[ $variant.position ] = $variant;
       });
-        
+
       temp.forEach( function( $key ){
         if( !flag ){
           if( $settings.hide_unavailable ){
@@ -180,7 +174,7 @@
           };
         };
       });
-            
+
       return $first;
     };
   };
