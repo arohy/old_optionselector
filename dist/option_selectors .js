@@ -882,7 +882,6 @@ function OptionSelectors(selector_id, $config){
 
         if( is_finded ){
           $options[ option_index ].selected = $variant.position;
-          return false;
         };
       })
 
